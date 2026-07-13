@@ -1,0 +1,73 @@
+package com.smartexpense.tracker.presentation.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
+import com.smartexpense.tracker.presentation.add_expense.AddExpenseScreen
+import com.smartexpense.tracker.presentation.dashboard.DashboardScreen
+import com.smartexpense.tracker.presentation.settings.SettingsScreen
+import com.smartexpense.tracker.presentation.settings.ExpenseModeScreen
+import com.smartexpense.tracker.presentation.settings.ManageCategoriesScreen
+import com.smartexpense.tracker.presentation.settings.ManagePaymentModesScreen
+import com.smartexpense.tracker.presentation.transactions.TransactionsScreen
+import com.smartexpense.tracker.presentation.reports.ReportsScreen
+import com.smartexpense.tracker.presentation.reports.DetailedModeReportScreen
+import com.smartexpense.tracker.presentation.backup.BackupScreen
+import com.smartexpense.tracker.presentation.security.SecurityScreen
+import com.smartexpense.tracker.presentation.help.UserInstructionsScreen
+
+
+
+@Composable
+fun AppNavigation(navController: NavHostController) {
+    NavHost(navController = navController, startDestination = Screen.Dashboard.route) {
+        composable(Screen.Dashboard.route) {
+            DashboardScreen(navController = navController)
+        }
+        composable(Screen.Transactions.route) {
+            TransactionsScreen(navController = navController)
+        }
+        composable(
+            route = Screen.AddExpense.route + "?expenseId={expenseId}",
+            arguments = listOf(navArgument("expenseId") {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            })
+        ) { backStackEntry ->
+            val expenseIdStr = backStackEntry.arguments?.getString("expenseId")
+            val expenseId = expenseIdStr?.toLongOrNull()
+            AddExpenseScreen(navController = navController, expenseId = expenseId)
+        }
+        composable(Screen.Settings.route) {
+            SettingsScreen(navController = navController)
+        }
+        composable(Screen.ExpenseModes.route) {
+            ExpenseModeScreen(navController = navController)
+        }
+        composable(Screen.ManageCategories.route) {
+            ManageCategoriesScreen(navController = navController)
+        }
+        composable(Screen.ManagePaymentModes.route) {
+            ManagePaymentModesScreen(navController = navController)
+        }
+        composable(Screen.Reports.route) {
+            ReportsScreen(navController = navController)
+        }
+        composable(Screen.DetailedModeReport.route) {
+            DetailedModeReportScreen(navController = navController)
+        }
+        composable(Screen.DataBackup.route) {
+            BackupScreen(navController = navController)
+        }
+        composable(Screen.Security.route) {
+            SecurityScreen(navController = navController)
+        }
+        composable(Screen.UserInstructions.route) {
+            UserInstructionsScreen(navController = navController)
+        }
+    }
+}
