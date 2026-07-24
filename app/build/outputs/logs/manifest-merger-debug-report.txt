@@ -1,20 +1,20 @@
 -- Merging decision tree log ---
 provider#androidx.core.content.FileProvider
-INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:74:9-82:20
+INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:81:9-89:20
 	android:grantUriPermissions
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:78:13-47
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:85:13-47
 	android:authorities
 		INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:76:13-60
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:83:13-60
 	android:exported
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:77:13-37
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:84:13-37
 	android:name
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:75:13-62
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:82:13-62
 manifest
-ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:2:1-86:12
-INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:2:1-86:12
-INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:2:1-86:12
-INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:2:1-86:12
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:2:1-93:12
+INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:2:1-93:12
+INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:2:1-93:12
+INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:2:1-93:12
 MERGED from [com.patrykandpatrick.vico:compose-m3:1.13.1] C:\Users\DELL\.gradle\caches\transforms-3\bf7731058e962e2afaec7c2c50a3d59c\transformed\compose-m3-1.13.1\AndroidManifest.xml:2:1-7:12
 MERGED from [com.patrykandpatrick.vico:compose:1.13.1] C:\Users\DELL\.gradle\caches\transforms-3\2e43c5aff8eb5c5346e68ceec78faad5\transformed\compose-1.13.1\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.work:work-runtime-ktx:2.9.0] C:\Users\DELL\.gradle\caches\transforms-3\e68ef6d4c90e7d4fdf5f204d2b579223\transformed\work-runtime-ktx-2.9.0\AndroidManifest.xml:17:1-22:12
@@ -138,8 +138,8 @@ ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:20:5-77
 	android:name
 		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:20:22-74
 application
-ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:22:5-84:19
-INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:22:5-84:19
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:22:5-91:19
+INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:22:5-91:19
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\DELL\.gradle\caches\transforms-3\1fec0ad24140183dd518d54ae5023649\transformed\work-runtime-2.9.0\AndroidManifest.xml:28:5-143:19
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\DELL\.gradle\caches\transforms-3\1fec0ad24140183dd518d54ae5023649\transformed\work-runtime-2.9.0\AndroidManifest.xml:28:5-143:19
 MERGED from [com.google.android.gms:play-services-location:21.1.0] C:\Users\DELL\.gradle\caches\transforms-3\42e5e8bf525e8751a4686a11078f146e\transformed\play-services-location-21.1.0\AndroidManifest.xml:7:5-20
@@ -224,48 +224,54 @@ data
 ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:46:17-55
 	android:mimeType
 		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:46:23-52
-activity#com.smartexpense.tracker.presentation.sms_dialog.SmsExpenseDialogActivity
-ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:50:9-54:40
-	android:excludeFromRecents
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:53:13-46
-	android:exported
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:54:13-37
-	android:theme
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:52:13-72
-	android:name
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:51:13-77
 receiver#com.smartexpense.tracker.services.SmsReceiver
-ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:57:9-64:20
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:53:9-60:20
 	android:exported
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:59:13-36
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:55:13-36
 	android:permission
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:60:13-66
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:56:13-66
 	android:name
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:58:13-49
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:54:13-49
 intent-filter#action:name:android.provider.Telephony.SMS_RECEIVED
-ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:61:13-63:29
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:57:13-59:29
 	android:priority
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:61:28-50
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:57:28-50
 action#android.provider.Telephony.SMS_RECEIVED
-ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:62:17-82
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:58:17-82
 	android:name
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:62:25-79
-service#com.smartexpense.tracker.services.OverlayService
-ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:67:9-71:58
-	android:enabled
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:69:13-35
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:58:25-79
+service#com.smartexpense.tracker.services.EmailNotificationListenerService
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:63:9-71:19
+	android:label
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:65:13-45
 	android:exported
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:70:13-37
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:67:13-36
+	android:permission
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:66:13-87
+	android:name
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:64:13-70
+intent-filter#action:name:android.service.notification.NotificationListenerService
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:68:13-70:29
+action#android.service.notification.NotificationListenerService
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:69:17-99
+	android:name
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:69:25-96
+service#com.smartexpense.tracker.services.OverlayService
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:74:9-78:58
+	android:enabled
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:76:13-35
+	android:exported
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:77:13-37
 	android:foregroundServiceType
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:71:13-55
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:78:13-55
 	android:name
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:68:13-52
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:75:13-52
 meta-data#android.support.FILE_PROVIDER_PATHS
-ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:79:13-81:54
+ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:86:13-88:54
 	android:resource
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:81:17-51
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:88:17-51
 	android:name
-		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:80:17-67
+		ADDED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml:87:17-67
 uses-sdk
 INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from D:\DKM\AndroidExp\app\src\main\AndroidManifest.xml

@@ -59,6 +59,14 @@ fun SettingsScreen(navController: NavController) {
             }
             item {
                 SettingsItem(
+                    title = "Automation",
+                    subtitle = "Read SMS & Email notifications",
+                    icon = Icons.Default.Settings,
+                    onClick = { navController.navigate(Screen.Automation.route) }
+                )
+            }
+            item {
+                SettingsItem(
                     icon = Icons.Default.Share,
                     title = "Data & Backup",
                     subtitle = "Export or import your data",

@@ -8,10 +8,12 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
@@ -21,16 +23,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(
     navController: NavController,
     viewModel: AddExpenseViewModel = hiltViewModel(),
-    expenseId: Long? = null
+    expenseId: Long? = null,
+    autoAmount: String? = null,
+    autoMerchant: String? = null,
+    autoBank: String? = null,
+    autoSource: String? = null
 ) {
     val amount by viewModel.amount.collectAsState()
     val merchant by viewModel.merchant.collectAsState()
+    val note by viewModel.note.collectAsState()
+    val date by viewModel.date.collectAsState()
     val category by viewModel.category.collectAsState()
     val paymentMode by viewModel.paymentMode.collectAsState()
     val paidBy by viewModel.paidBy.collectAsState()
@@ -41,8 +52,13 @@ fun AddExpenseScreen(
     LaunchedEffect(expenseId) {
         if (expenseId != null && expenseId != 0L) {
             viewModel.loadExpense(expenseId)
+        } else if (autoAmount != null) {
+            viewModel.populateFromAutoSync(autoAmount, autoMerchant, autoBank, autoSource)
         }
     }
+
+    // Always default to Manual Entry (0) because Auto-Sync (1) is a settings page
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
 
     Scaffold(
         topBar = {
@@ -55,127 +71,253 @@ fun AddExpenseScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
         ) {
-            if (activeMode != null) {
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
-                ) {
-                    Text(
-                        text = "Active Mode: ${activeMode!!.name}",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        modifier = Modifier.padding(16.dp)
+            TabRow(
+                selectedTabIndex = selectedTabIndex,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.primary,
+                indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
+            ) {
+                Tab(
+                    selected = selectedTabIndex == 0,
+                    onClick = { selectedTabIndex = 0 },
+                    text = { Text("Manual Entry", style = MaterialTheme.typography.titleSmall) }
+                )
+                Tab(
+                    selected = selectedTabIndex == 1,
+                    onClick = { selectedTabIndex = 1 },
+                    text = { Text("Auto-Sync (Email)", style = MaterialTheme.typography.titleSmall) }
+                )
             }
-        
-            Spacer(modifier = Modifier.height(24.dp))
             
-            OutlinedTextField(
-                value = amount,
-                onValueChange = viewModel::updateAmount,
-                label = { Text("Amount (₹)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            OutlinedTextField(
-                value = merchant,
-                onValueChange = viewModel::updateMerchant,
-                label = { Text("Merchant / Receiver") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = paidBy,
-                onValueChange = viewModel::updatePaidBy,
-                label = { Text("Paid By (e.g. John, Me)") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            if (paymentModes.isNotEmpty()) {
-                var expanded by remember { mutableStateOf(false) }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp) // Fiscal Precision container-margin
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Spacer(modifier = Modifier.height(24.dp)) // section-padding
                 
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
-                ) {
-                    OutlinedTextField(
-                        value = paymentMode,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Payment Mode") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor()
-                    )
+                if (selectedTabIndex == 0) {
+                    // --- Manual Entry View ---
                     
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        paymentModes.forEach { mode ->
-                            DropdownMenuItem(
-                                text = { Text(mode.name) },
-                                onClick = {
-                                    viewModel.updatePaymentMode(mode.name)
-                                    expanded = false
-                                }
+                    if (activeMode != null) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+                        ) {
+                            Text(
+                                text = "Active Mode: ${activeMode!!.name}",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier.padding(16.dp)
                             )
                         }
                     }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            val categories by viewModel.categories.collectAsState()
-            
-            Text("Select Category", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.heightIn(max = 200.dp)
-            ) {
-                items(categories) { cat ->
-                    val isSelected = cat.name == category
-                    Button(
-                        onClick = { viewModel.updateCategory(cat.name) },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer
-                        ),
-                        contentPadding = PaddingValues(4.dp)
+
+                    if (autoSource != null) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(
+                                    text = "Automatic Tracking ($autoSource)",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Expense details parsed automatically. Please review and save.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                        }
+                    }
+
+                    // Prominent Amount Input
+                    OutlinedTextField(
+                        value = amount,
+                        onValueChange = viewModel::updateAmount,
+                        label = { Text("Amount") },
+                        prefix = { Text("₹") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Date & Merchant
+                    OutlinedTextField(
+                        value = date,
+                        onValueChange = viewModel::updateDate,
+                        label = { Text("Date") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    OutlinedTextField(
+                        value = merchant,
+                        onValueChange = viewModel::updateMerchant,
+                        label = { Text("Merchant") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = note,
+                        onValueChange = viewModel::updateNote,
+                        label = { Text("Note") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    val categories by viewModel.categories.collectAsState()
+                    
+                    Text("Category", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.heightIn(max = 150.dp)
                     ) {
-                        Text(text = cat.name, maxLines = 1, style = MaterialTheme.typography.bodySmall)
+                        items(categories) { cat ->
+                            val isSelected = cat.name == category
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = { viewModel.updateCategory(cat.name) },
+                                label = { Text(cat.name, maxLines = 1, style = MaterialTheme.typography.bodySmall) },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            )
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    Button(
+                        onClick = {
+                            viewModel.saveExpense {
+                                navController.navigate("dashboard") {
+                                    popUpTo("dashboard") { inclusive = false }
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp), // Touch target
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary, // Emerald Green
+                            contentColor = MaterialTheme.colorScheme.onTertiary
+                        ),
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text(
+                            text = if (expenseId != null) "Update Expense" else "Save Expense",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                } else {
+                    // --- Auto-Sync (Email) View ---
+                    
+                    Text(
+                        text = "Automatic Tracking",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Text(
+                        text = "SmartExpenseTracker can securely read your transaction emails to automatically populate expense forms. You review every entry before it is saved.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Email, 
+                                    contentDescription = "Email",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text("Connected Accounts", style = MaterialTheme.typography.titleMedium)
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("No email accounts are currently connected. Tap below to authorize Gmail or Outlook.", style = MaterialTheme.typography.bodySmall)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = { /* Connect Email flow */ },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text("Connect Email Account")
+                            }
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Parse Merchant Names", style = MaterialTheme.typography.titleMedium)
+                            Text("Extract specific merchant names from receipts", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Switch(
+                            checked = true,
+                            onCheckedChange = { /* Toggle */ },
+                            colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.tertiary)
+                        )
                     }
                 }
-            }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Button(
-                onClick = {
-                    viewModel.saveExpense {
-                        navController.popBackStack()
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Text(if (expenseId != null) "Update Expense" else "Save Expense")
             }
         }
     }

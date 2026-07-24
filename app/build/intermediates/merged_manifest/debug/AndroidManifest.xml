@@ -66,11 +66,6 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.smartexpense.tracker.presentation.sms_dialog.SmsExpenseDialogActivity"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!-- SMS Receiver -->
         <receiver
@@ -81,6 +76,17 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
+        <!-- Email Notification Listener Service -->
+        <service
+            android:name="com.smartexpense.tracker.services.EmailNotificationListenerService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" >
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
         <!-- Floating Overlay Service -->
         <service

@@ -47,17 +47,17 @@ class SmsReceiver : BroadcastReceiver() {
                     
                     if (amount != null) {
                         val notificationId = System.currentTimeMillis().toInt()
-                        val activityIntent = Intent(context, com.smartexpense.tracker.presentation.sms_dialog.SmsExpenseDialogActivity::class.java).apply {
+                        val uriString = "smartexpense://add_expense?amount=$amount" +
+                                (merchant?.let { "&merchant=${android.net.Uri.encode(it)}" } ?: "") +
+                                "&bank=${android.net.Uri.encode(bank)}&source=SMS"
+                        val activityIntent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uriString)).apply {
+                            setPackage(context.packageName)
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            putExtra("sms_amount", amount)
-                            putExtra("sms_merchant", merchant)
-                            putExtra("sms_bank", bank)
-                            putExtra("notification_id", notificationId)
                         }
                         
                         val pendingIntent = PendingIntent.getActivity(
                             context,
-                            0,
+                            notificationId,
                             activityIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                         )

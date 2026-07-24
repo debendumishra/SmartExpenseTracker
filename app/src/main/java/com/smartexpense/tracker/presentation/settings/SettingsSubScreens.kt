@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -360,6 +361,81 @@ fun ManagePaymentModesScreen(
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AutomationScreen(
+    navController: NavController
+) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val prefs = context.getSharedPreferences("app_settings", android.content.Context.MODE_PRIVATE)
+    var readEmailsEnabled by remember { mutableStateOf(prefs.getBoolean("read_email_notifications", false)) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Automation") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Automate your expense tracking by allowing the app to read notifications.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Read Email Notifications", style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            "Automatically capture expenses from credit card email alerts.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = readEmailsEnabled,
+                        onCheckedChange = { isChecked ->
+                            if (isChecked) {
+                                val intent = android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                                context.startActivity(intent)
+                                android.widget.Toast.makeText(context, "Please enable Notification Access for Smart Expense Tracker", android.widget.Toast.LENGTH_LONG).show()
+                                prefs.edit().putBoolean("read_email_notifications", true).apply()
+                                readEmailsEnabled = true
+                            } else {
+                                prefs.edit().putBoolean("read_email_notifications", false).apply()
+                                readEmailsEnabled = false
+                            }
+                        }
+                    )
                 }
             }
         }

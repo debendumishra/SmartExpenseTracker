@@ -47,11 +47,7 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".presentation.sms_dialog.SmsExpenseDialogActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:excludeFromRecents="true"
-            android:exported="false" />
+
         
         <!-- SMS Receiver -->
         <receiver
@@ -62,6 +58,17 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
+        <!-- Email Notification Listener Service -->
+        <service
+            android:name=".services.EmailNotificationListenerService"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
         
         <!-- Floating Overlay Service -->
         <service

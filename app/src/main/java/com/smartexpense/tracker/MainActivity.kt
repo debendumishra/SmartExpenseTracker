@@ -133,16 +133,16 @@ class MainActivity : ComponentActivity() {
 
     private fun sendExpenseNotification(amount: Double, merchant: String?, bank: String) {
         val notificationId = System.currentTimeMillis().toInt()
-        val activityIntent = Intent(this, com.smartexpense.tracker.presentation.sms_dialog.SmsExpenseDialogActivity::class.java).apply {
+        val uriString = "smartexpense://add_expense?amount=$amount" +
+                (merchant?.let { "&merchant=${android.net.Uri.encode(it)}" } ?: "") +
+                "&bank=${android.net.Uri.encode(bank)}&source=Share"
+        val activityIntent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uriString)).apply {
+            setPackage(packageName)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("sms_amount", amount)
-            putExtra("sms_merchant", merchant)
-            putExtra("sms_bank", bank)
-            putExtra("notification_id", notificationId)
         }
 
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, activityIntent,
+            this, notificationId, activityIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 

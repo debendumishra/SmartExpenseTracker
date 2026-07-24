@@ -17,22 +17,28 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFFD0BCFF),
-    secondary = Color(0xFFCCC2DC),
-    tertiary = Color(0xFFEFB8C8)
+    primary = Color(0xFF0F172A), // Deep Navy
+    secondary = Color(0xFF64748B), // Slate Gray
+    tertiary = Color(0xFF10B981), // Emerald Green
+    background = Color(0xFF0F172A),
+    surface = Color(0xFF1E293B)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF6650a4),
-    secondary = Color(0xFF625b71),
-    tertiary = Color(0xFF7D5260)
+    primary = Color(0xFF0F172A), // Deep Navy
+    secondary = Color(0xFF64748B), // Slate Gray
+    tertiary = Color(0xFF10B981), // Emerald Green
+    background = Color(0xFFF8FAFC), // Off-White
+    surface = Color(0xFFFFFFFF),
+    onPrimary = Color.White,
+    onTertiary = Color.White
 )
 
 @Composable
 fun SmartExpenseTrackerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // We disable dynamic color to enforce our Fiscal Precision theme across all Android versions
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

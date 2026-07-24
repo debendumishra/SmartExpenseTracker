@@ -39,6 +39,7 @@ class AddExpenseViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var editingExpense: ExpenseEntity? = null
+    private var expenseSource: String = "Manual"
 
     val categories: StateFlow<List<CategoryEntity>> = categoryRepository.getAllCategories()
         .stateIn(
@@ -59,6 +60,12 @@ class AddExpenseViewModel @Inject constructor(
     
     private val _merchant = MutableStateFlow("")
     val merchant: StateFlow<String> = _merchant.asStateFlow()
+    
+    private val _note = MutableStateFlow("")
+    val note: StateFlow<String> = _note.asStateFlow()
+    
+    private val _date = MutableStateFlow("Today") // Placeholder for datepicker UI
+    val date: StateFlow<String> = _date.asStateFlow()
     
     private val _category = MutableStateFlow("Food") // Default
     val category: StateFlow<String> = _category.asStateFlow()
@@ -84,6 +91,14 @@ class AddExpenseViewModel @Inject constructor(
         _merchant.value = newMerchant
     }
     
+    fun updateNote(newNote: String) {
+        _note.value = newNote
+    }
+    
+    fun updateDate(newDate: String) {
+        _date.value = newDate
+    }
+    
     fun updateCategory(newCategory: String) {
         _category.value = newCategory
     }
@@ -103,10 +118,25 @@ class AddExpenseViewModel @Inject constructor(
                 editingExpense = expense
                 _amount.value = expense.amount.toString()
                 _merchant.value = expense.merchant ?: ""
+                _note.value = expense.notes ?: ""
                 _category.value = expense.purpose ?: "Food"
                 _paymentMode.value = expense.paymentMode ?: "Cash"
                 _paidBy.value = expense.paidBy ?: "Me"
+                expenseSource = expense.source ?: "Manual"
             }
+        }
+    }
+
+    fun populateFromAutoSync(autoAmount: String, autoMerchant: String?, autoBank: String?, autoSource: String?) {
+        _amount.value = autoAmount
+        if (!autoMerchant.isNullOrBlank()) {
+            _merchant.value = autoMerchant
+        }
+        if (!autoSource.isNullOrBlank()) {
+            expenseSource = autoSource
+        }
+        if (!autoBank.isNullOrBlank()) {
+            // Can map bank to paymentMode if desired, but let's just leave it or use a default
         }
     }
 
@@ -152,6 +182,7 @@ class AddExpenseViewModel @Inject constructor(
                         paidBy = paidBy.value.takeIf { it.isNotBlank() },
                         // Optionally update location if requested, but let's just keep original location or overwrite? 
                         // Overwrite with new location if available
+                        notes = note.value.takeIf { it.isNotBlank() },
                         latitude = latitude ?: existing.latitude,
                         longitude = longitude ?: existing.longitude,
                         city = city ?: existing.city,
@@ -174,9 +205,9 @@ class AddExpenseViewModel @Inject constructor(
                         address = address,
                         city = city,
                         state = null,
-                        notes = null,
-                        source = "Manual",
-                        smsTimestamp = null,
+                        notes = note.value.takeIf { it.isNotBlank() },
+                        source = expenseSource,
+                        smsTimestamp = System.currentTimeMillis(),
                         paidBy = paidBy.value.takeIf { it.isNotBlank() }
                     )
                     expenseRepository.insertExpense(expense)
