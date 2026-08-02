@@ -15,14 +15,13 @@ object SmsParser {
     // Keywords indicating a debit transaction
     private val debitKeywords = listOf(
         "debited", "spent", "paid", "sent", "deducted", "withdrawn",
-        "purchase", "transaction", "payment", "transfer", "charged"
+        "purchase", "transaction", "payment", "transfer", "charged", "made on"
     )
 
     // Keywords to ignore (OTPs, promotions, etc.)
     private val ignoreKeywords = listOf(
         "otp", "one time password", "verification code", "login code",
-        "promotional", "offer", "discount", "recharge", "cashback received",
-        "credited to your", "deposited"
+        "credited to your", "deposited", "received"
     )
 
     fun isExpenseSms(messageBody: String): Boolean {
@@ -51,9 +50,9 @@ object SmsParser {
         prefixPattern.find(messageBody)?.groupValues?.get(1)?.replace(",", "")?.toDoubleOrNull()
             ?.let { return it }
 
-        // Try amount after debit keyword
+        // Try amount after debit keyword or "transaction of"
         val debitAmountPattern = Regex(
-            "(?i)(?:debited|paid|sent|deducted|withdrawn|charged)[^0-9₹]*(?:rs\\.?|inr|₹)?\\s*([0-9,]+\\.?[0-9]*)"
+            "(?i)(?:debited|paid|sent|deducted|withdrawn|charged|transaction of|spent)[^0-9₹]*(?:rs\\.?|inr|₹)?\\s*([0-9,]+\\.?[0-9]*)"
         )
         debitAmountPattern.find(messageBody)?.groupValues?.get(1)?.replace(",", "")?.toDoubleOrNull()
             ?.let { return it }

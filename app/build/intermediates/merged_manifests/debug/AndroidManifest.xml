@@ -65,6 +65,17 @@
 
                 <data android:mimeType="text/plain" />
             </intent-filter>
+            <!-- Deep Links -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="add_expense"
+                    android:scheme="smartexpense" />
+            </intent-filter>
         </activity>
 
         <!-- SMS Receiver -->
