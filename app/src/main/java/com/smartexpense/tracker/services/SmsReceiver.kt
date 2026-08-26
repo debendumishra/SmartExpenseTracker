@@ -48,7 +48,7 @@ class SmsReceiver : BroadcastReceiver() {
                     if (amount != null) {
                         val notificationId = System.currentTimeMillis().toInt()
                         val uriString = "smartexpense://add_expense?amount=$amount" +
-                                (merchant?.let { "&merchant=${android.net.Uri.encode(it)}" } ?: "") +
+                                "&merchant=${android.net.Uri.encode(merchant ?: "")}" +
                                 "&bank=${android.net.Uri.encode(bank)}&source=SMS"
                         val activityIntent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uriString)).apply {
                             setPackage(context.packageName)

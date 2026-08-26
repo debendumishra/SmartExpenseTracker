@@ -12,11 +12,7 @@ import com.smartexpense.tracker.utils.SmsParser
 class EmailNotificationListenerService : NotificationListenerService() {
     private val TAG = "EmailNotifService"
 
-    private val targetPackages = listOf(
-        "com.google.android.gm", // Gmail
-        "com.microsoft.office.outlook", // Outlook
-        "com.yahoo.mobile.client.android.mail" // Yahoo Mail
-    )
+    // Removed targetPackages to allow any app's notification to be parsed (e.g. Bank apps)
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
@@ -28,8 +24,11 @@ class EmailNotificationListenerService : NotificationListenerService() {
         if (!readEmailsEnabled) return
 
         val packageName = sbn.packageName
-        if (targetPackages.contains(packageName)) {
-            val extras = sbn.notification.extras
+        
+        // Ignore our own notifications to prevent infinite loops
+        if (packageName == this.packageName) return
+        
+        val extras = sbn.notification.extras
             val title = extras.getString(Notification.EXTRA_TITLE) ?: ""
             val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
             
@@ -51,7 +50,7 @@ class EmailNotificationListenerService : NotificationListenerService() {
                             "&merchant=${android.net.Uri.encode(merchant)}" +
                             "&bank=${android.net.Uri.encode(bankName)}&source=Email"
                     val activityIntent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(uriString)).apply {
-                        setPackage(packageName)
+                        setPackage(this@EmailNotificationListenerService.packageName)
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     }
 
@@ -86,6 +85,5 @@ class EmailNotificationListenerService : NotificationListenerService() {
                     }
                 }
             }
-        }
     }
 }
