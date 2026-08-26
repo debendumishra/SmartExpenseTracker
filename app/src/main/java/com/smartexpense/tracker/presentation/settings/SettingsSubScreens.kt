@@ -35,6 +35,39 @@ fun ExpenseModeScreen(
     val activeMode by viewModel.activeMode.collectAsState()
     val allModes by viewModel.allModes.collectAsState()
     val newModeName by viewModel.newModeName.collectAsState()
+    val showDeleteDialog = remember { mutableStateOf(false) }
+    val modeToDelete = remember { mutableStateOf<com.smartexpense.tracker.data.local.entity.ExpenseModeEntity?>(null) }
+
+    if (showDeleteDialog.value && modeToDelete.value != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog.value = false
+                modeToDelete.value = null
+            },
+            title = { Text("Delete Expense Mode?") },
+            text = { Text("Are you sure you want to delete '${modeToDelete.value?.name}'? This will permanently delete ALL expenses associated with this mode. This action cannot be undone.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        modeToDelete.value?.let { viewModel.deleteExpenseMode(it) }
+                        showDeleteDialog.value = false
+                        modeToDelete.value = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showDeleteDialog.value = false
+                    modeToDelete.value = null
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -128,10 +161,26 @@ fun ExpenseModeScreen(
                                 )
                             }
                             if (mode.isActive) {
-                                Icon(Icons.Default.CheckCircle, contentDescription = "Active", tint = MaterialTheme.colorScheme.primary)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.CheckCircle, contentDescription = "Active", tint = MaterialTheme.colorScheme.primary)
+                                    IconButton(onClick = {
+                                        modeToDelete.value = mode
+                                        showDeleteDialog.value = true
+                                    }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                    }
+                                }
                             } else {
-                                TextButton(onClick = { viewModel.reenableMode(mode) }) {
-                                    Text("Restart")
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    TextButton(onClick = { viewModel.reenableMode(mode) }) {
+                                        Text("Restart")
+                                    }
+                                    IconButton(onClick = {
+                                        modeToDelete.value = mode
+                                        showDeleteDialog.value = true
+                                    }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                    }
                                 }
                             }
                         }

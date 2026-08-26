@@ -16,6 +16,9 @@ interface ExpenseModeDao {
     @Update
     suspend fun updateMode(mode: ExpenseModeEntity)
 
+    @androidx.room.Delete
+    suspend fun deleteMode(mode: ExpenseModeEntity)
+
     @Query("SELECT * FROM expense_modes WHERE isActive = 1 LIMIT 1")
     fun getActiveMode(): Flow<ExpenseModeEntity?>
 

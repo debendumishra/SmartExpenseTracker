@@ -6,8 +6,11 @@ import com.smartexpense.tracker.domain.repository.ExpenseModeRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+import com.smartexpense.tracker.data.local.dao.ExpenseDao
+
 class ExpenseModeRepositoryImpl @Inject constructor(
-    private val dao: ExpenseModeDao
+    private val dao: ExpenseModeDao,
+    private val expenseDao: ExpenseDao
 ) : ExpenseModeRepository {
 
     override suspend fun insertMode(mode: ExpenseModeEntity): Long {
@@ -16,6 +19,11 @@ class ExpenseModeRepositoryImpl @Inject constructor(
 
     override suspend fun updateMode(mode: ExpenseModeEntity) {
         dao.updateMode(mode)
+    }
+
+    override suspend fun deleteModeWithExpenses(mode: ExpenseModeEntity) {
+        expenseDao.deleteExpensesByModeId(mode.id)
+        dao.deleteMode(mode)
     }
 
     override suspend fun deactivateCurrentMode(endTime: Long) {

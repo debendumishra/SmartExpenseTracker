@@ -20,6 +20,9 @@ interface ExpenseDao {
     @androidx.room.Delete
     suspend fun deleteExpense(expense: ExpenseEntity)
 
+    @Query("DELETE FROM expenses WHERE expenseModeId = :modeId")
+    suspend fun deleteExpensesByModeId(modeId: Long)
+
     @Query("SELECT * FROM expenses ORDER BY timestamp DESC")
     fun getAllExpenses(): Flow<List<ExpenseEntity>>
 

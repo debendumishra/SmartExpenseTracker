@@ -55,6 +55,24 @@ class AddExpenseViewModel @Inject constructor(
             initialValue = null
         )
 
+    val allExpenseModes: StateFlow<List<ExpenseModeEntity>> = modeRepository.getAllModes()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    private val _selectedExpenseMode = MutableStateFlow<ExpenseModeEntity?>(null)
+    val selectedExpenseMode: StateFlow<ExpenseModeEntity?> = _selectedExpenseMode.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            modeRepository.getActiveMode().firstOrNull()?.let {
+                _selectedExpenseMode.value = it
+            }
+        }
+    }
+
     private val _amount = MutableStateFlow("")
     val amount: StateFlow<String> = _amount.asStateFlow()
     
@@ -111,6 +129,10 @@ class AddExpenseViewModel @Inject constructor(
         _paidBy.value = newPaidBy
     }
 
+    fun updateSelectedExpenseMode(mode: ExpenseModeEntity?) {
+        _selectedExpenseMode.value = mode
+    }
+
     fun loadExpense(id: Long) {
         viewModelScope.launch {
             val expense = expenseRepository.getExpenseById(id)
@@ -123,6 +145,17 @@ class AddExpenseViewModel @Inject constructor(
                 _paymentMode.value = expense.paymentMode ?: "Cash"
                 _paidBy.value = expense.paidBy ?: "Me"
                 expenseSource = expense.source ?: "Manual"
+                
+                // If the expense has a mode, set it in the view model
+                if (expense.expenseModeId != null) {
+                    val mode = allExpenseModes.value.find { it.id == expense.expenseModeId }
+                    if (mode != null) {
+                        _selectedExpenseMode.value = mode
+                    }
+                } else {
+                    _selectedExpenseMode.value = null
+                }
+
             }
         }
     }
@@ -171,7 +204,7 @@ class AddExpenseViewModel @Inject constructor(
                     // Ignore location exception, fallback to null
                 }
 
-                val activeMode = activeMode.value
+                val selectedModeId = selectedExpenseMode.value?.id
                 val existing = editingExpense
                 if (existing != null) {
                     val updated = existing.copy(
@@ -186,7 +219,8 @@ class AddExpenseViewModel @Inject constructor(
                         latitude = latitude ?: existing.latitude,
                         longitude = longitude ?: existing.longitude,
                         city = city ?: existing.city,
-                        address = address ?: existing.address
+                        address = address ?: existing.address,
+                        expenseModeId = selectedModeId
                     )
                     expenseRepository.updateExpense(updated)
                 } else {
@@ -197,7 +231,7 @@ class AddExpenseViewModel @Inject constructor(
                         bankId = null,
                         paymentMode = paymentMode.value,
                         merchant = merchant.value,
-                        expenseModeId = activeMode?.id,
+                        expenseModeId = selectedModeId,
                         timestamp = System.currentTimeMillis(),
                         entryTimestamp = System.currentTimeMillis(),
                         latitude = latitude,

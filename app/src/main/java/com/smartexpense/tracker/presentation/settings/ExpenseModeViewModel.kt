@@ -55,6 +55,12 @@ class ExpenseModeViewModel @Inject constructor(
         }
     }
 
+    fun deleteExpenseMode(mode: ExpenseModeEntity) {
+        viewModelScope.launch {
+            modeRepository.deleteModeWithExpenses(mode)
+        }
+    }
+
     fun reenableMode(mode: ExpenseModeEntity) {
         viewModelScope.launch {
             modeRepository.deactivateCurrentMode(System.currentTimeMillis())

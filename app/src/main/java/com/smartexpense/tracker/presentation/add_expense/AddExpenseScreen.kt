@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
@@ -46,8 +47,8 @@ fun AddExpenseScreen(
     val paymentMode by viewModel.paymentMode.collectAsState()
     val paidBy by viewModel.paidBy.collectAsState()
     val paymentModes by viewModel.paymentModes.collectAsState()
-
-    val activeMode by viewModel.activeMode.collectAsState()
+    val allExpenseModes by viewModel.allExpenseModes.collectAsState()
+    val selectedExpenseMode by viewModel.selectedExpenseMode.collectAsState()
 
     LaunchedEffect(expenseId) {
         if (expenseId != null && expenseId != 0L) {
@@ -106,19 +107,43 @@ fun AddExpenseScreen(
                 if (selectedTabIndex == 0) {
                     // --- Manual Entry View ---
                     
-                    if (activeMode != null) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+                    var modeExpanded by remember { mutableStateOf(false) }
+                    ExposedDropdownMenuBox(
+                        expanded = modeExpanded,
+                        onExpandedChange = { modeExpanded = !modeExpanded }
+                    ) {
+                        OutlinedTextField(
+                            value = selectedExpenseMode?.name ?: "General (No Mode)",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Expense Mode") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = modeExpanded) },
+                            colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                            modifier = Modifier.fillMaxWidth().menuAnchor()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = modeExpanded,
+                            onDismissRequest = { modeExpanded = false }
                         ) {
-                            Text(
-                                text = "Active Mode: ${activeMode!!.name}",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onTertiaryContainer,
-                                modifier = Modifier.padding(16.dp)
+                            DropdownMenuItem(
+                                text = { Text("General (No Mode)") },
+                                onClick = {
+                                    viewModel.updateSelectedExpenseMode(null)
+                                    modeExpanded = false
+                                }
                             )
+                            allExpenseModes.forEach { mode ->
+                                DropdownMenuItem(
+                                    text = { Text(mode.name) },
+                                    onClick = {
+                                        viewModel.updateSelectedExpenseMode(mode)
+                                        modeExpanded = false
+                                    }
+                                )
+                            }
                         }
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     if (autoSource != null) {
                         Card(

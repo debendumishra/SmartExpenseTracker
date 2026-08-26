@@ -9,6 +9,7 @@ import androidx.room.EntityDeletionOrUpdateAdapter;
 import androidx.room.EntityInsertionAdapter;
 import androidx.room.RoomDatabase;
 import androidx.room.RoomSQLiteQuery;
+import androidx.room.SharedSQLiteStatement;
 import androidx.room.util.CursorUtil;
 import androidx.room.util.DBUtil;
 import androidx.sqlite.db.SupportSQLiteStatement;
@@ -43,6 +44,8 @@ public final class ExpenseDao_Impl implements ExpenseDao {
   private final EntityDeletionOrUpdateAdapter<ExpenseEntity> __deletionAdapterOfExpenseEntity;
 
   private final EntityDeletionOrUpdateAdapter<ExpenseEntity> __updateAdapterOfExpenseEntity;
+
+  private final SharedSQLiteStatement __preparedStmtOfDeleteExpensesByModeId;
 
   public ExpenseDao_Impl(@NonNull final RoomDatabase __db) {
     this.__db = __db;
@@ -226,6 +229,14 @@ public final class ExpenseDao_Impl implements ExpenseDao {
         statement.bindLong(20, entity.getId());
       }
     };
+    this.__preparedStmtOfDeleteExpensesByModeId = new SharedSQLiteStatement(__db) {
+      @Override
+      @NonNull
+      public String createQuery() {
+        final String _query = "DELETE FROM expenses WHERE expenseModeId = ?";
+        return _query;
+      }
+    };
   }
 
   @Override
@@ -280,6 +291,32 @@ public final class ExpenseDao_Impl implements ExpenseDao {
           return Unit.INSTANCE;
         } finally {
           __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object deleteExpensesByModeId(final long modeId,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        final SupportSQLiteStatement _stmt = __preparedStmtOfDeleteExpensesByModeId.acquire();
+        int _argIndex = 1;
+        _stmt.bindLong(_argIndex, modeId);
+        try {
+          __db.beginTransaction();
+          try {
+            _stmt.executeUpdateDelete();
+            __db.setTransactionSuccessful();
+            return Unit.INSTANCE;
+          } finally {
+            __db.endTransaction();
+          }
+        } finally {
+          __preparedStmtOfDeleteExpensesByModeId.release(_stmt);
         }
       }
     }, $completion);

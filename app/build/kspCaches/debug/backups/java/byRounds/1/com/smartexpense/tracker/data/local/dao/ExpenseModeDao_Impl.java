@@ -36,6 +36,8 @@ public final class ExpenseModeDao_Impl implements ExpenseModeDao {
 
   private final EntityInsertionAdapter<ExpenseModeEntity> __insertionAdapterOfExpenseModeEntity;
 
+  private final EntityDeletionOrUpdateAdapter<ExpenseModeEntity> __deletionAdapterOfExpenseModeEntity;
+
   private final EntityDeletionOrUpdateAdapter<ExpenseModeEntity> __updateAdapterOfExpenseModeEntity;
 
   private final SharedSQLiteStatement __preparedStmtOfDeactivateCurrentMode;
@@ -62,6 +64,19 @@ public final class ExpenseModeDao_Impl implements ExpenseModeDao {
         } else {
           statement.bindLong(5, entity.getEndedAt());
         }
+      }
+    };
+    this.__deletionAdapterOfExpenseModeEntity = new EntityDeletionOrUpdateAdapter<ExpenseModeEntity>(__db) {
+      @Override
+      @NonNull
+      protected String createQuery() {
+        return "DELETE FROM `expense_modes` WHERE `id` = ?";
+      }
+
+      @Override
+      protected void bind(@NonNull final SupportSQLiteStatement statement,
+          @NonNull final ExpenseModeEntity entity) {
+        statement.bindLong(1, entity.getId());
       }
     };
     this.__updateAdapterOfExpenseModeEntity = new EntityDeletionOrUpdateAdapter<ExpenseModeEntity>(__db) {
@@ -109,6 +124,25 @@ public final class ExpenseModeDao_Impl implements ExpenseModeDao {
           final Long _result = __insertionAdapterOfExpenseModeEntity.insertAndReturnId(mode);
           __db.setTransactionSuccessful();
           return _result;
+        } finally {
+          __db.endTransaction();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object deleteMode(final ExpenseModeEntity mode,
+      final Continuation<? super Unit> $completion) {
+    return CoroutinesRoom.execute(__db, true, new Callable<Unit>() {
+      @Override
+      @NonNull
+      public Unit call() throws Exception {
+        __db.beginTransaction();
+        try {
+          __deletionAdapterOfExpenseModeEntity.handle(mode);
+          __db.setTransactionSuccessful();
+          return Unit.INSTANCE;
         } finally {
           __db.endTransaction();
         }
