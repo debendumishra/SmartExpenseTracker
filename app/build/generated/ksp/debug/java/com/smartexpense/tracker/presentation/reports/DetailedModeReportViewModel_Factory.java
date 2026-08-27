@@ -1,5 +1,6 @@
 package com.smartexpense.tracker.presentation.reports;
 
+import androidx.lifecycle.SavedStateHandle;
 import com.smartexpense.tracker.domain.repository.ExpenseRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -24,22 +25,27 @@ import javax.inject.Provider;
 public final class DetailedModeReportViewModel_Factory implements Factory<DetailedModeReportViewModel> {
   private final Provider<ExpenseRepository> expenseRepositoryProvider;
 
-  public DetailedModeReportViewModel_Factory(
-      Provider<ExpenseRepository> expenseRepositoryProvider) {
+  private final Provider<SavedStateHandle> savedStateHandleProvider;
+
+  public DetailedModeReportViewModel_Factory(Provider<ExpenseRepository> expenseRepositoryProvider,
+      Provider<SavedStateHandle> savedStateHandleProvider) {
     this.expenseRepositoryProvider = expenseRepositoryProvider;
+    this.savedStateHandleProvider = savedStateHandleProvider;
   }
 
   @Override
   public DetailedModeReportViewModel get() {
-    return newInstance(expenseRepositoryProvider.get());
+    return newInstance(expenseRepositoryProvider.get(), savedStateHandleProvider.get());
   }
 
   public static DetailedModeReportViewModel_Factory create(
-      Provider<ExpenseRepository> expenseRepositoryProvider) {
-    return new DetailedModeReportViewModel_Factory(expenseRepositoryProvider);
+      Provider<ExpenseRepository> expenseRepositoryProvider,
+      Provider<SavedStateHandle> savedStateHandleProvider) {
+    return new DetailedModeReportViewModel_Factory(expenseRepositoryProvider, savedStateHandleProvider);
   }
 
-  public static DetailedModeReportViewModel newInstance(ExpenseRepository expenseRepository) {
-    return new DetailedModeReportViewModel(expenseRepository);
+  public static DetailedModeReportViewModel newInstance(ExpenseRepository expenseRepository,
+      SavedStateHandle savedStateHandle) {
+    return new DetailedModeReportViewModel(expenseRepository, savedStateHandle);
   }
 }

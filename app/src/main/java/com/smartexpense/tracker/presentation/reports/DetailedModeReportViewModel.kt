@@ -11,13 +11,19 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
+import androidx.lifecycle.SavedStateHandle
+
 @HiltViewModel
 class DetailedModeReportViewModel @Inject constructor(
-    private val expenseRepository: ExpenseRepository
+    private val expenseRepository: ExpenseRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    private val startDate: Long = savedStateHandle.get<Long>("startDate") ?: 0L
+    private val endDate: Long = savedStateHandle.get<Long>("endDate") ?: Long.MAX_VALUE
+
     val detailedModeReportData: StateFlow<Map<String, List<DetailedModeExpense>>> =
-        expenseRepository.getDetailedModeExpenses()
+        expenseRepository.getDetailedModeExpenses(startDate, endDate)
             .map { list -> 
                 list.groupBy { it.modeName ?: "General" }
             }
@@ -28,7 +34,7 @@ class DetailedModeReportViewModel @Inject constructor(
             )
 
     val rawExpenses: StateFlow<List<com.smartexpense.tracker.data.local.entity.ExportExpenseDTO>> = 
-        expenseRepository.getExpensesForExport(0L, Long.MAX_VALUE)
+        expenseRepository.getExpensesForExport(startDate, endDate)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5000),

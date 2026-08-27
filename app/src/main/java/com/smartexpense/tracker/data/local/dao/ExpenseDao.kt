@@ -47,8 +47,8 @@ interface ExpenseDao {
     """)
     fun getExpensesForExport(startDate: Long, endDate: Long): Flow<List<com.smartexpense.tracker.data.local.entity.ExportExpenseDTO>>
     
-    @Query("SELECT x.id, COALESCE(e.name, 'General') AS modeName, x.amount, x.purpose, x.merchant, x.city AS location, x.timestamp FROM expenses x LEFT JOIN expense_modes e ON x.expenseModeId = e.id ORDER BY COALESCE(e.name, 'General'), x.timestamp DESC")
-    fun getDetailedModeExpenses(): Flow<List<com.smartexpense.tracker.data.local.entity.DetailedModeExpense>>
+    @Query("SELECT x.id, COALESCE(e.name, 'General') AS modeName, x.amount, x.purpose, x.merchant, x.city AS location, x.timestamp FROM expenses x LEFT JOIN expense_modes e ON x.expenseModeId = e.id WHERE x.timestamp >= :startDate AND x.timestamp <= :endDate ORDER BY COALESCE(e.name, 'General'), x.timestamp DESC")
+    fun getDetailedModeExpenses(startDate: Long, endDate: Long): Flow<List<com.smartexpense.tracker.data.local.entity.DetailedModeExpense>>
     
     @Query("SELECT SUM(amount) FROM expenses WHERE timestamp >= :startDate AND timestamp <= :endDate")
     fun getTotalSpentBetween(startDate: Long, endDate: Long): Flow<Double?>

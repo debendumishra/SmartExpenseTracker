@@ -735,7 +735,7 @@ public final class DaggerTrackerApplication_HiltComponents_SingletonC {
           return (T) DatabaseModule_ProvideAppDatabaseFactory.provideAppDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           case 3: // com.smartexpense.tracker.data.repository.ExpenseModeRepositoryImpl 
-          return (T) new ExpenseModeRepositoryImpl(singletonCImpl.provideExpenseModeDaoProvider.get());
+          return (T) new ExpenseModeRepositoryImpl(singletonCImpl.provideExpenseModeDaoProvider.get(), singletonCImpl.provideExpenseDaoProvider.get());
 
           case 4: // com.smartexpense.tracker.data.local.dao.ExpenseModeDao 
           return (T) DatabaseModule_ProvideExpenseModeDaoFactory.provideExpenseModeDao(singletonCImpl.provideAppDatabaseProvider.get());

@@ -432,6 +432,8 @@ public final class DaggerTrackerApplication_HiltComponents_SingletonC {
   }
 
   private static final class ViewModelCImpl extends TrackerApplication_HiltComponents.ViewModelC {
+    private final SavedStateHandle savedStateHandle;
+
     private final SingletonCImpl singletonCImpl;
 
     private final ActivityRetainedCImpl activityRetainedCImpl;
@@ -463,7 +465,7 @@ public final class DaggerTrackerApplication_HiltComponents_SingletonC {
         ViewModelLifecycle viewModelLifecycleParam) {
       this.singletonCImpl = singletonCImpl;
       this.activityRetainedCImpl = activityRetainedCImpl;
-
+      this.savedStateHandle = savedStateHandleParam;
       initialize(savedStateHandleParam, viewModelLifecycleParam);
 
     }
@@ -528,7 +530,7 @@ public final class DaggerTrackerApplication_HiltComponents_SingletonC {
           return (T) new DashboardViewModel(singletonCImpl.bindExpenseRepositoryProvider.get(), singletonCImpl.bindExpenseModeRepositoryProvider.get());
 
           case 3: // com.smartexpense.tracker.presentation.reports.DetailedModeReportViewModel 
-          return (T) new DetailedModeReportViewModel(singletonCImpl.bindExpenseRepositoryProvider.get());
+          return (T) new DetailedModeReportViewModel(singletonCImpl.bindExpenseRepositoryProvider.get(), viewModelCImpl.savedStateHandle);
 
           case 4: // com.smartexpense.tracker.presentation.settings.ExpenseModeViewModel 
           return (T) new ExpenseModeViewModel(singletonCImpl.bindExpenseModeRepositoryProvider.get());

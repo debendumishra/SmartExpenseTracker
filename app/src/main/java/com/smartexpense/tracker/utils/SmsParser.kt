@@ -15,7 +15,8 @@ object SmsParser {
     // Keywords indicating a debit transaction
     private val debitKeywords = listOf(
         "debited", "spent", "paid", "sent", "deducted", "withdrawn",
-        "purchase", "transaction", "payment", "transfer", "charged", "made on"
+        "purchase", "transaction", "payment", "transfer", "charged", "made on",
+        "sbi credit card", "sbi card", "credit card ending", "card ending"
     )
 
     // Keywords to ignore (OTPs, promotions, etc.)

@@ -12,6 +12,12 @@ import com.smartexpense.tracker.utils.SmsParser
 class EmailNotificationListenerService : NotificationListenerService() {
     private val TAG = "EmailNotifService"
 
+    companion object {
+        // Map to store hash of notification text to timestamp for debouncing
+        private val recentlyProcessed = mutableMapOf<Int, Long>()
+        private const val DEBOUNCE_WINDOW_MS = 15000L
+    }
+
     // Removed targetPackages to allow any app's notification to be parsed (e.g. Bank apps)
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
@@ -31,15 +37,30 @@ class EmailNotificationListenerService : NotificationListenerService() {
         val extras = sbn.notification.extras
             val title = extras.getString(Notification.EXTRA_TITLE) ?: ""
             val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
-            
-            // Sometimes email apps put the body in EXTRA_BIG_TEXT
             val bigText = extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString() ?: ""
             
-            val fullText = "$title $text $bigText"
+            // Extract from InboxStyle if available (common for email apps like Gmail)
+            val textLines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
+            val linesString = textLines?.joinToString(" ") ?: ""
+            
+            val fullText = "$title $text $bigText $linesString"
+            val messageHash = fullText.hashCode()
+
+            val currentTime = System.currentTimeMillis()
+            
+            // Clean up old entries
+            recentlyProcessed.entries.removeIf { currentTime - it.value > DEBOUNCE_WINDOW_MS }
+            
+            // Check debounce
+            if (recentlyProcessed.containsKey(messageHash)) {
+                Log.d(TAG, "Duplicate notification ignored.")
+                return
+            }
 
             Log.d(TAG, "Notification received from $packageName: $fullText")
 
             if (SmsParser.isExpenseSms(fullText)) {
+                recentlyProcessed[messageHash] = currentTime
                 val amount = SmsParser.extractAmount(fullText)
                 if (amount != null) {
                     val merchant = SmsParser.extractMerchant(fullText) ?: "Unknown Merchant"

@@ -54,10 +54,22 @@ class DashboardViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             recentExpenses.collect { expenses ->
-                _totalSpent.value = expenses.sumOf { it.amount }
-                // Calculate totals by category for the pie chart
+                // Filter for current month
+                val calendar = Calendar.getInstance()
+                val currentMonth = calendar.get(Calendar.MONTH)
+                val currentYear = calendar.get(Calendar.YEAR)
+                
+                val currentMonthExpenses = expenses.filter { expense ->
+                    val expenseCalendar = Calendar.getInstance()
+                    expenseCalendar.timeInMillis = expense.timestamp
+                    expenseCalendar.get(Calendar.MONTH) == currentMonth &&
+                    expenseCalendar.get(Calendar.YEAR) == currentYear
+                }
+
+                _totalSpent.value = currentMonthExpenses.sumOf { it.amount }
+                // Calculate totals by category for the pie chart using current month expenses
                 val categoryMap = mutableMapOf<String, Float>()
-                expenses.forEach { expense ->
+                currentMonthExpenses.forEach { expense ->
                     val cat = expense.purpose ?: "Other"
                     categoryMap[cat] = categoryMap.getOrDefault(cat, 0f) + expense.amount.toFloat()
                 }

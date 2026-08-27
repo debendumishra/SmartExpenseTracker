@@ -181,7 +181,9 @@ fun ReportsScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { navController.navigate(com.smartexpense.tracker.presentation.navigation.Screen.DetailedModeReport.route) },
+                onClick = { 
+                    navController.navigate(com.smartexpense.tracker.presentation.navigation.Screen.DetailedModeReport.route + "?startDate=$fromDate&endDate=$toDate") 
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("View Detailed Mode-wise Report")

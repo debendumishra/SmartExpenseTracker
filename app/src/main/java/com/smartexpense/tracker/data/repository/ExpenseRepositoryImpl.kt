@@ -42,8 +42,8 @@ class ExpenseRepositoryImpl @Inject constructor(
         return dao.getExpensesForExport(startDate, endDate)
     }
 
-    override fun getDetailedModeExpenses(): Flow<List<com.smartexpense.tracker.data.local.entity.DetailedModeExpense>> {
-        return dao.getDetailedModeExpenses()
+    override fun getDetailedModeExpenses(startDate: Long, endDate: Long): Flow<List<com.smartexpense.tracker.data.local.entity.DetailedModeExpense>> {
+        return dao.getDetailedModeExpenses(startDate, endDate)
     }
 
     override fun getTotalSpentBetween(startDate: Long, endDate: Long): Flow<Double?> {

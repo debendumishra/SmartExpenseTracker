@@ -14,11 +14,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
@@ -184,18 +188,49 @@ fun AddExpenseScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // Date & Merchant
-                    OutlinedTextField(
-                        value = date,
-                        onValueChange = viewModel::updateDate,
-                        label = { Text("Date") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                    val datePickerState = rememberDatePickerState()
+                    var showDatePicker by remember { mutableStateOf(false) }
+
+                    if (showDatePicker) {
+                        DatePickerDialog(
+                            onDismissRequest = { showDatePicker = false },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    showDatePicker = false
+                                    datePickerState.selectedDateMillis?.let { millis ->
+                                        val formatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+                                        viewModel.updateDate(formatter.format(java.util.Date(millis)))
+                                    }
+                                }) {
+                                    Text("OK")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showDatePicker = false }) {
+                                    Text("Cancel")
+                                }
+                            }
+                        ) {
+                            DatePicker(state = datePickerState)
+                        }
+                    }
+
+                    // Date
+                    Box(modifier = Modifier.fillMaxWidth().clickable { showDatePicker = true }) {
+                        OutlinedTextField(
+                            value = date,
+                            onValueChange = {},
+                            label = { Text("Date") },
+                            readOnly = true,
+                            enabled = false,
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                disabledBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         )
-                    )
+                    }
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
@@ -281,6 +316,10 @@ fun AddExpenseScreen(
                 } else {
                     // --- Auto-Sync (Email) View ---
                     
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    val prefs = context.getSharedPreferences("app_settings", android.content.Context.MODE_PRIVATE)
+                    var readEmailsEnabled by remember { mutableStateOf(prefs.getBoolean("read_email_notifications", false)) }
+                    
                     Text(
                         text = "Automatic Tracking",
                         style = MaterialTheme.typography.headlineMedium,
@@ -299,48 +338,39 @@ fun AddExpenseScreen(
                     
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Email, 
-                                    contentDescription = "Email",
-                                    tint = MaterialTheme.colorScheme.primary
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Read Email & SMS Notifications", style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    "Automatically capture expenses from credit card and bank alerts.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text("Connected Accounts", style = MaterialTheme.typography.titleMedium)
                             }
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text("No email accounts are currently connected. Tap below to authorize Gmail or Outlook.", style = MaterialTheme.typography.bodySmall)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Button(
-                                onClick = { /* Connect Email flow */ },
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Connect Email Account")
-                            }
+                            Switch(
+                                checked = readEmailsEnabled,
+                                onCheckedChange = { isChecked ->
+                                    if (isChecked) {
+                                        val intent = android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                                        context.startActivity(intent)
+                                        android.widget.Toast.makeText(context, "Please enable Notification Access for Smart Expense Tracker", android.widget.Toast.LENGTH_LONG).show()
+                                        prefs.edit().putBoolean("read_email_notifications", true).apply()
+                                        readEmailsEnabled = true
+                                    } else {
+                                        prefs.edit().putBoolean("read_email_notifications", false).apply()
+                                        readEmailsEnabled = false
+                                    }
+                                }
+                            )
                         }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("Parse Merchant Names", style = MaterialTheme.typography.titleMedium)
-                            Text("Extract specific merchant names from receipts", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        Switch(
-                            checked = true,
-                            onCheckedChange = { /* Toggle */ },
-                            colors = SwitchDefaults.colors(checkedTrackColor = MaterialTheme.colorScheme.tertiary)
-                        )
                     }
                 }
             }

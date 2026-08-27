@@ -1018,9 +1018,14 @@ public final class ExpenseDao_Impl implements ExpenseDao {
   }
 
   @Override
-  public Flow<List<DetailedModeExpense>> getDetailedModeExpenses() {
-    final String _sql = "SELECT x.id, COALESCE(e.name, 'General') AS modeName, x.amount, x.purpose, x.merchant, x.city AS location, x.timestamp FROM expenses x LEFT JOIN expense_modes e ON x.expenseModeId = e.id ORDER BY COALESCE(e.name, 'General'), x.timestamp DESC";
-    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 0);
+  public Flow<List<DetailedModeExpense>> getDetailedModeExpenses(final long startDate,
+      final long endDate) {
+    final String _sql = "SELECT x.id, COALESCE(e.name, 'General') AS modeName, x.amount, x.purpose, x.merchant, x.city AS location, x.timestamp FROM expenses x LEFT JOIN expense_modes e ON x.expenseModeId = e.id WHERE x.timestamp >= ? AND x.timestamp <= ? ORDER BY COALESCE(e.name, 'General'), x.timestamp DESC";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 2);
+    int _argIndex = 1;
+    _statement.bindLong(_argIndex, startDate);
+    _argIndex = 2;
+    _statement.bindLong(_argIndex, endDate);
     return CoroutinesRoom.createFlow(__db, false, new String[] {"expenses",
         "expense_modes"}, new Callable<List<DetailedModeExpense>>() {
       @Override

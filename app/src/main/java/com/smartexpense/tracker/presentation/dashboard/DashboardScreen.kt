@@ -54,7 +54,7 @@ fun DashboardScreen(
         }
 
         Text(
-            text = "Total Spent",
+            text = "Total Spent (This Month)",
             style = MaterialTheme.typography.titleMedium
         )
         Text(

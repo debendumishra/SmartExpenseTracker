@@ -97,7 +97,19 @@ fun AppNavigation(navController: NavHostController) {
         composable(Screen.Reports.route) {
             ReportsScreen(navController = navController)
         }
-        composable(Screen.DetailedModeReport.route) {
+        composable(
+            route = Screen.DetailedModeReport.route + "?startDate={startDate}&endDate={endDate}",
+            arguments = listOf(
+                navArgument("startDate") {
+                    type = NavType.LongType
+                    defaultValue = 0L
+                },
+                navArgument("endDate") {
+                    type = NavType.LongType
+                    defaultValue = Long.MAX_VALUE
+                }
+            )
+        ) { backStackEntry ->
             DetailedModeReportScreen(navController = navController)
         }
         composable(Screen.DataBackup.route) {

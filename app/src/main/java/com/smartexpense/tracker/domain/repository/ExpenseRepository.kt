@@ -14,7 +14,7 @@ interface ExpenseRepository {
     
     fun getExpensesForExport(startDate: Long, endDate: Long): Flow<List<com.smartexpense.tracker.data.local.entity.ExportExpenseDTO>>
 
-    fun getDetailedModeExpenses(): Flow<List<com.smartexpense.tracker.data.local.entity.DetailedModeExpense>>
+    fun getDetailedModeExpenses(startDate: Long, endDate: Long): Flow<List<com.smartexpense.tracker.data.local.entity.DetailedModeExpense>>
     fun getTotalSpentBetween(startDate: Long, endDate: Long): Flow<Double?>
     fun getReportByCategory(startDate: Long, endDate: Long): Flow<List<com.smartexpense.tracker.data.local.entity.ReportGroupSum>>
     fun getReportByPurpose(startDate: Long, endDate: Long): Flow<List<com.smartexpense.tracker.data.local.entity.ReportGroupSum>>
